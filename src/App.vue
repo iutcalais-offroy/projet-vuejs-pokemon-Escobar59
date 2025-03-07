@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {NConfigProvider} from 'naive-ui';
 import HeaderMenu from './components/HeaderMenu.component.vue';
+
 </script>
 
 <template>
