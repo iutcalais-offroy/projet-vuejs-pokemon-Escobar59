@@ -1,6 +1,74 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+
+const isLogin = ref(true);
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const isAuthenticated = ref(false);
+
+// Vérification du token au chargement
+onMounted(() => {
+  const token = localStorage.getItem("userToken");
+  isAuthenticated.value = !!token;
+});
+
+// Génère un token unique
+const generateToken = () => {
+  return Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+};
+
+// Gère la connexion ou l'inscription
+const handleSubmit = () => {
+  if (!email.value || !password.value) {
+    alert("Veuillez remplir tous les champs !");
+    return;
+  }
+
+  if (!isLogin.value && password.value !== confirmPassword.value) {
+    alert("Les mots de passe ne correspondent pas !");
+    return;
+  }
+
+  const userId = email.value; // Utilisation de l'email comme ID
+  const token = generateToken();
+
+  // Stockage en local
+  localStorage.setItem("userToken", token);
+  localStorage.setItem("userId", userId);
+
+  isAuthenticated.value = true;
+  alert(isLogin.value ? "Connexion réussie !" : "Compte créé avec succès !");
+};
+
+// Déconnexion
+const logout = () => {
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("userId");
+
+  isAuthenticated.value = false;
+  email.value = "";
+  password.value = "";
+  confirmPassword.value = "";
+
+  alert("Déconnexion réussie !");
+};
+
+// Récupération de l'utilisateur connecté
+const userId = computed(() => localStorage.getItem("userId") || "Utilisateur");
+
+// Basculer entre connexion et inscription
+const toggleForm = () => {
+  isLogin.value = !isLogin.value;
+  email.value = '';
+  password.value = '';
+  confirmPassword.value = '';
+};
+</script>
+
 <template>
   <div class="container">
-    <div class="form-box">
+    <div v-if="!isAuthenticated" class="form-box">
       <h2>{{ isLogin ? "Connexion" : "Créer un compte" }}</h2>
       <form @submit.prevent="handleSubmit">
         <div class="input-group">
@@ -28,35 +96,16 @@
         <span @click="toggleForm">{{ isLogin ? "S'inscrire" : "Se connecter" }}</span>
       </p>
     </div>
+
+    <div v-else class="form-box">
+      <h2>Bienvenue, {{ userId }} !</h2>
+      <p>Vous êtes connecté 🎉</p>
+      <button @click="logout">Se déconnecter</button>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-
-const isLogin = ref(true); // Mode actuel (connexion ou inscription)
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-
-const toggleForm = () => {
-  isLogin.value = !isLogin.value;
-  email.value = '';
-  password.value = '';
-  confirmPassword.value = '';
-};
-
-const handleSubmit = () => {
-  if (!isLogin.value && password.value !== confirmPassword.value) {
-    alert("Les mots de passe ne correspondent pas !");
-    return;
-  }
-  alert(isLogin.value ? "Connexion réussie !" : "Compte créé avec succès !");
-};
-</script>
-
 <style scoped>
-/* Centrage du formulaire */
 .container {
   display: flex;
   justify-content: center;
@@ -65,7 +114,6 @@ const handleSubmit = () => {
   background-color: #f4f4f4;
 }
 
-/* Boîte du formulaire */
 .form-box {
   background: white;
   padding: 20px;
@@ -75,13 +123,11 @@ const handleSubmit = () => {
   text-align: center;
 }
 
-/* Titre */
 h2 {
   margin-bottom: 15px;
   color: #333;
 }
 
-/* Champs d'entrée */
 .input-group {
   margin-bottom: 10px;
   text-align: left;
@@ -101,7 +147,6 @@ input {
   font-size: 14px;
 }
 
-/* Bouton */
 button {
   width: 100%;
   padding: 10px;
@@ -118,7 +163,6 @@ button:hover {
   background-color: #0056b3;
 }
 
-/* Texte bascule */
 .toggle-text {
   margin-top: 10px;
   font-size: 14px;
