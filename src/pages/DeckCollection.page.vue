@@ -1,28 +1,39 @@
 <template>
-  <n-card title="Collection de Pokémon">
-    <n-space wrap align="center" justify="center">
-      <n-card
-        v-for="pokemon in filteredPokemons"
-        :key="pokemon.id"
-        :style="{ width: '200px', margin: '10px' }"
-        :title="pokemon.name"
-        hoverable
-      >
-        <template #header>
-          <div style="text-align: center;">
-            <img :src="pokemon.image" alt="pokemon.name" style="width: 100px; height: 100px;" />
+  <div>
+    <!-- Champ de recherche -->
+    <n-input v-model="searchQuery" placeholder="Recherchez un Pokémon..." style="margin-bottom: 20px;" />
+
+    <n-card v-if="filteredPokemons.length > 0" title="Résultat de la recherche">
+      <n-space wrap align="center" justify="center">
+        <!-- Affiche uniquement le Pokémon filtré -->
+        <n-card
+          v-for="pokemon in filteredPokemons"
+          :key="pokemon.id"
+          :style="{ width: '200px', margin: '10px' }"
+          :title="pokemon.name"
+          hoverable
+        >
+          <template #header>
+            <div style="text-align: center;">
+              <img :src="pokemon.image" alt="pokemon.name" style="width: 100px; height: 100px;" />
+            </div>
+          </template>
+          <div>
+            <p><strong>PV:</strong> {{ pokemon.pv }}</p>
+            <p><strong>Type:</strong> {{ pokemon.type }}</p>
+            <p><strong>Taille:</strong> {{ pokemon.taille }}</p>
+            <p><strong>Poids:</strong> {{ pokemon.poids }}</p>
+            <p><strong>Attaque:</strong> {{ pokemon.attaque.nom }} ({{ pokemon.attaque.pv }} PV)</p>
           </div>
-        </template>
-        <div>
-          <p><strong>PV:</strong> {{ pokemon.pv }}</p>
-          <p><strong>Type:</strong> {{ pokemon.type }}</p>
-          <p><strong>Taille:</strong> {{ pokemon.taille }}</p>
-          <p><strong>Poids:</strong> {{ pokemon.poids }}</p>
-          <p><strong>Attaque:</strong> {{ pokemon.attaque.nom }} ({{ pokemon.attaque.pv }} PV)</p>
-        </div>
-      </n-card>
-    </n-space>
-  </n-card>
+        </n-card>
+      </n-space>
+    </n-card>
+
+    <!-- Message si aucun Pokémon trouvé -->
+    <n-card v-else title="Aucun Pokémon trouvé">
+      <p>Votre recherche n'a produit aucun résultat. Essayez un autre nom.</p>
+    </n-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -81,7 +92,7 @@ const filteredPokemons = computed(() =>
 </script>
 
 <style scoped>
-
+/* Styles inchangés */
 .container {
   display: flex;
   justify-content: center;
@@ -172,4 +183,3 @@ button:active {
   text-decoration: underline;
 }
 </style>
-
